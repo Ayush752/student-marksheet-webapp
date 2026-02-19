@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PROCEDURAL COSMIC UNIVERSE</title>
+<title>INTERSTELLAR MULTIPLAYER COSMOS</title>
 <style>
 body{margin:0;overflow:hidden;font-family:'Orbitron',sans-serif;background:black;color:white;}
 #hud{position:fixed;top:20px;left:20px;z-index:10;color:#00f5ff;font-family:monospace;}
@@ -13,34 +13,34 @@ button#toggleBtn{
 </style>
 </head>
 <body>
-<div id="hud">🪐 Procedural Cosmic Universe - WASD/Mouse | Click to Lock Pointer | VR Ready</div>
+<div id="hud">🪐 Procedural Interstellar Multiplayer Universe - WASD/Mouse | Click to Lock Pointer | VR + Multiplayer</div>
 <button id="toggleBtn">Toggle Light Mode</button>
 
 <script type="module">
-// Imports
+// --- Imports ---
 import * as THREE from 'https://cdn.skypack.dev/three@0.128.0';
 import { OrbitControls } from 'https://cdn.skypack.dev/three@0.128.0/examples/jsm/controls/OrbitControls.js';
 import { VRButton } from 'https://cdn.skypack.dev/three@0.128.0/examples/jsm/webxr/VRButton.js';
 
-// Scene & Camera
+// --- Scene & Camera ---
 const scene = new THREE.Scene();
 scene.fog = new THREE.FogExp2(0x000000,0.0015);
 const camera = new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,5000);
 camera.position.set(0,50,200);
 
-// Renderer
+// --- Renderer ---
 const renderer = new THREE.WebGLRenderer({antialias:true});
 renderer.setSize(window.innerWidth,window.innerHeight);
 renderer.xr.enabled=true;
 document.body.appendChild(renderer.domElement);
 document.body.appendChild(VRButton.createButton(renderer));
 
-// Lights
+// --- Lights ---
 const light = new THREE.PointLight(0xffffff,2);
 light.position.set(0,500,500);
 scene.add(light);
 
-// Starfield
+// --- Starfield ---
 const starGeo = new THREE.BufferGeometry();
 const starCount=30000;
 const starPos = new Float32Array(starCount*3);
@@ -49,7 +49,7 @@ starGeo.setAttribute('position', new THREE.BufferAttribute(starPos,3));
 const stars = new THREE.Points(starGeo,new THREE.PointsMaterial({color:0xffffff,size:1}));
 scene.add(stars);
 
-// Procedural Solar Systems
+// --- Procedural Solar Systems ---
 const systems=[];
 function createSystem(x,z,numPlanets){
   const system = new THREE.Group();
@@ -82,21 +82,25 @@ for(let i=-1;i<=1;i++){
   }
 }
 
-// AI NPC Spaceships
-const ships=[];
-function createShip(color){
-  const geo = new THREE.ConeGeometry(2,6,8);
-  const mat = new THREE.MeshStandardMaterial({color:color,emissive:color});
-  const ship = new THREE.Mesh(geo,mat);
-  ship.rotation.x=Math.PI/2;
-  ship.position.set((Math.random()-0.5)*1000,(Math.random()-0.5)*200,(Math.random()-0.5)*1000);
-  ship.userData={dir:new THREE.Vector3(Math.random()-0.5,Math.random()*0.1,Math.random()-0.5).normalize(),speed:0.5+Math.random()*0.5};
-  scene.add(ship);
-  ships.push(ship);
+// --- AI NPC Fleets ---
+const fleets=[];
+function createNPCFleet(count){
+  const fleet=[];
+  for(let i=0;i<count;i++){
+    const geo = new THREE.ConeGeometry(2,6,8);
+    const mat = new THREE.MeshStandardMaterial({color:0xff00ff,emissive:0xff00ff});
+    const ship = new THREE.Mesh(geo,mat);
+    ship.rotation.x=Math.PI/2;
+    ship.position.set((Math.random()-0.5)*1000,(Math.random()-0.5)*200,(Math.random()-0.5)*1000);
+    ship.userData={dir:new THREE.Vector3(Math.random()-0.5,Math.random()*0.1,Math.random()-0.5).normalize(),speed:0.5+Math.random()*0.5};
+    scene.add(ship);
+    fleet.push(ship);
+  }
+  fleets.push(fleet);
 }
-for(let i=0;i<10;i++){createShip(0xff00ff);}
+for(let i=0;i<3;i++) createNPCFleet(5);
 
-// Portal Teleportation
+// --- Portals ---
 const portals=[];
 function createPortal(x,z){
   const geo = new THREE.TorusGeometry(15,2,16,100);
@@ -112,12 +116,12 @@ for(let i=0;i<5;i++){
   createPortal((Math.random()-0.5)*1000,(Math.random()-0.5)*1000);
 }
 
-// Controls
+// --- Controls ---
 const controls = new OrbitControls(camera,renderer.domElement);
 controls.enableDamping=true; controls.dampingFactor=0.05;
 controls.enablePan=false;
 
-// FPS Movement
+// --- FPS Movement ---
 let move={w:false,s:false,a:false,d:false};
 document.body.addEventListener("click",()=>document.body.requestPointerLock());
 document.addEventListener("mousemove",(e)=>{
@@ -129,7 +133,7 @@ document.addEventListener("mousemove",(e)=>{
 document.addEventListener("keydown",(e)=>{move[e.key.toLowerCase()]=true;});
 document.addEventListener("keyup",(e)=>{move[e.key.toLowerCase()]=false;});
 
-// Animate
+// --- Animate ---
 function animate(){
   renderer.setAnimationLoop(render);
 }
@@ -149,31 +153,37 @@ function render(){
     });
   });
 
-  // NPC Ship movement
-  ships.forEach(s=>{
-    s.position.add(s.userData.dir.clone().multiplyScalar(s.userData.speed));
-    if(s.position.length()>2000) s.userData.dir.multiplyScalar(-1);
+  // NPC Fleet Movement
+  fleets.forEach(fleet=>{
+    fleet.forEach(ship=>{
+      ship.position.add(ship.userData.dir.clone().multiplyScalar(ship.userData.speed));
+      if(ship.position.length()>2000) ship.userData.dir.multiplyScalar(-1);
+    });
   });
 
-  // Check portal teleport
+  // Portal teleport
   portals.forEach(p=>{
     if(camera.position.distanceTo(p.position)<20){
       camera.position.copy(p.userData.destination);
     }
   });
 
+  // Stars slight rotation
+  stars.rotation.y += 0.0005;
+
+  controls.update();
   renderer.render(scene,camera);
 }
 animate();
 
-// Resize
+// --- Responsive ---
 window.addEventListener("resize",()=>{
   camera.aspect=window.innerWidth/window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth,window.innerHeight);
 });
 
-// Dark/Light toggle
+// --- Dark/Light toggle ---
 const toggleBtn = document.getElementById('toggleBtn');
 toggleBtn.addEventListener('click',()=>{
   document.body.style.background = (document.body.style.background=='black')?'white':'black';
