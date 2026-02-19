@@ -2,153 +2,181 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Interstellar Architect</title>
+<title>Cosmic Engine - All In One</title>
 <style>
-body{margin:0;overflow:hidden;background:black;}
+body{margin:0;overflow:hidden;background:black;color:white;font-family:monospace}
 #hud{
 position:fixed;
-top:20px;
-left:20px;
-color:#00f5ff;
-font-family:monospace;
+top:10px;
+left:10px;
 z-index:10;
+color:#00f5ff;
 }
 </style>
 </head>
 <body>
 
 <div id="hud">
-🌠 INTERSTELLAR ARCHITECT <br>
-Click to enter FPS Mode
+COSMIC ENGINE ONLINE<br>
+WASD Move | Mouse Look | VR Ready
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script type="module">
+import * as THREE from 'https://cdn.skypack.dev/three@0.128.0';
+import { VRButton } from 'https://cdn.skypack.dev/three@0.128.0/examples/jsm/webxr/VRButton.js';
 
-<script>
 let scene = new THREE.Scene();
-let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
+let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 5000);
 let renderer = new THREE.WebGLRenderer({antialias:true});
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.xr.enabled = true;
 document.body.appendChild(renderer.domElement);
+document.body.appendChild(VRButton.createButton(renderer));
 
 /* LIGHT */
 let light = new THREE.PointLight(0xffffff,2);
-light.position.set(10,20,10);
+light.position.set(50,50,50);
 scene.add(light);
 
-/* PROCEDURAL GALAXY */
-let starGeo = new THREE.BufferGeometry();
-let starCount = 10000;
-let posArray = new Float32Array(starCount*3);
-let colorArray = new Float32Array(starCount*3);
+/* STARFIELD */
+const starGeo = new THREE.BufferGeometry();
+const starCount = 8000;
+const positions = new Float32Array(starCount*3);
 
-for(let i=0;i<starCount;i++){
-  let i3 = i*3;
-  posArray[i3] = (Math.random()-0.5)*1500;
-  posArray[i3+1] = (Math.random()-0.5)*1500;
-  posArray[i3+2] = (Math.random()-0.5)*1500;
-
-  colorArray[i3] = Math.random();
-  colorArray[i3+1] = Math.random();
-  colorArray[i3+2] = 1;
+for(let i=0;i<starCount*3;i++){
+positions[i] = (Math.random()-0.5)*3000;
 }
 
-starGeo.setAttribute('position', new THREE.BufferAttribute(posArray,3));
-starGeo.setAttribute('color', new THREE.BufferAttribute(colorArray,3));
-
-let starMat = new THREE.PointsMaterial({size:1,vertexColors:true});
-let stars = new THREE.Points(starGeo, starMat);
+starGeo.setAttribute('position', new THREE.BufferAttribute(positions,3));
+const starMat = new THREE.PointsMaterial({color:0x00f5ff,size:1});
+const stars = new THREE.Points(starGeo,starMat);
 scene.add(stars);
 
-/* PLANETS */
-function createPlanet(color,x,z){
-  let geo = new THREE.SphereGeometry(5,32,32);
-  let mat = new THREE.MeshStandardMaterial({
-    color:color,
-    emissive:color,
-    emissiveIntensity:0.3
-  });
-  let mesh = new THREE.Mesh(geo,mat);
-  mesh.position.set(x,0,z);
-  scene.add(mesh);
-  return mesh;
+/* PROCEDURAL SOLAR SYSTEM */
+let planets = [];
+
+function createSolarSystem(){
+const sun = new THREE.Mesh(
+new THREE.SphereGeometry(20,32,32),
+new THREE.MeshBasicMaterial({color:0xffff00})
+);
+scene.add(sun);
+
+for(let i=0;i<6;i++){
+let distance = 60 + i*40;
+let size = Math.random()*5+5;
+
+let planet = new THREE.Mesh(
+new THREE.SphereGeometry(size,32,32),
+new THREE.MeshStandardMaterial({
+color:new THREE.Color(Math.random(),Math.random(),Math.random())
+})
+);
+
+planet.userData = {
+distance:distance,
+angle:Math.random()*Math.PI*2,
+speed:0.001+Math.random()*0.002
+};
+
+planets.push(planet);
+scene.add(planet);
+}
 }
 
-let planet1 = createPlanet(0x2222ff,-30,-100);
-let planet2 = createPlanet(0xff0022,40,-200);
+createSolarSystem();
 
-/* PORTAL */
-let portalGeo = new THREE.TorusGeometry(8,1,16,100);
-let portalMat = new THREE.MeshBasicMaterial({color:0x00f5ff});
-let portal = new THREE.Mesh(portalGeo, portalMat);
-portal.position.set(0,0,-50);
-scene.add(portal);
+/* AI NPC */
+class NPC{
+constructor(position){
+this.mesh = new THREE.Mesh(
+new THREE.SphereGeometry(5,32,32),
+new THREE.MeshStandardMaterial({color:0xff00ff})
+);
+this.mesh.position.copy(position);
+scene.add(this.mesh);
+}
 
-/* FPS CONTROLS */
-let moveForward=false,moveBackward=false,moveLeft=false,moveRight=false;
+update(playerPos){
+let direction = playerPos.clone().sub(this.mesh.position);
+direction.normalize();
+this.mesh.position.add(direction.multiplyScalar(0.1));
+}
+}
+
+let npc = new NPC(new THREE.Vector3(100,0,-200));
+
+/* PLAYER CONTROLS */
+let move = {w:false,s:false,a:false,d:false};
 let velocity = new THREE.Vector3();
 
-document.body.addEventListener("click",()=>{
-  document.body.requestPointerLock();
-});
+document.body.addEventListener("click",()=>document.body.requestPointerLock());
 
 document.addEventListener("mousemove",(e)=>{
-  if(document.pointerLockElement===document.body){
-    camera.rotation.y -= e.movementX*0.002;
-    camera.rotation.x -= e.movementY*0.002;
-  }
-});
-
-document.addEventListener("keydown",(e)=>{
-  if(e.key==="w") moveForward=true;
-  if(e.key==="s") moveBackward=true;
-  if(e.key==="a") moveLeft=true;
-  if(e.key==="d") moveRight=true;
-});
-document.addEventListener("keyup",(e)=>{
-  if(e.key==="w") moveForward=false;
-  if(e.key==="s") moveBackward=false;
-  if(e.key==="a") moveLeft=false;
-  if(e.key==="d") moveRight=false;
-});
-
-camera.position.z = 20;
-
-/* ANIMATION LOOP */
-function animate(){
-  requestAnimationFrame(animate);
-
-  velocity.set(0,0,0);
-  if(moveForward) velocity.z -= 0.5;
-  if(moveBackward) velocity.z += 0.5;
-  if(moveLeft) velocity.x -= 0.5;
-  if(moveRight) velocity.x += 0.5;
-
-  camera.translateX(velocity.x);
-  camera.translateZ(velocity.z);
-
-  /* Rotate Planets */
-  planet1.rotation.y += 0.01;
-  planet2.rotation.y += 0.008;
-
-  /* Rotate Portal */
-  portal.rotation.x += 0.02;
-  portal.rotation.y += 0.02;
-
-  /* TELEPORT */
-  if(camera.position.distanceTo(portal.position)<10){
-    camera.position.set(0,0,200);
-  }
-
-  renderer.render(scene,camera);
+if(document.pointerLockElement===document.body){
+camera.rotation.y -= e.movementX*0.002;
+camera.rotation.x -= e.movementY*0.002;
 }
+});
+
+document.addEventListener("keydown",(e)=>move[e.key.toLowerCase()]=true);
+document.addEventListener("keyup",(e)=>move[e.key.toLowerCase()]=false);
+
+camera.position.z = 100;
+
+/* MULTIPLAYER STUB */
+function sendPlayerState(){
+const state = {
+x:camera.position.x,
+y:camera.position.y,
+z:camera.position.z
+};
+// Replace with WebSocket send later
+console.log("Sending player state",state);
+}
+
+/* ENGINE LOOP */
+function animate(){
+renderer.setAnimationLoop(render);
+}
+
+function render(){
+
+velocity.set(0,0,0);
+if(move.w) velocity.z -= 1;
+if(move.s) velocity.z += 1;
+if(move.a) velocity.x -= 1;
+if(move.d) velocity.x += 1;
+
+camera.translateX(velocity.x);
+camera.translateZ(velocity.z);
+
+/* Planet Orbit */
+planets.forEach(p=>{
+p.userData.angle += p.userData.speed;
+p.position.x = Math.cos(p.userData.angle)*p.userData.distance;
+p.position.z = Math.sin(p.userData.angle)*p.userData.distance;
+});
+
+/* NPC AI */
+npc.update(camera.position);
+
+/* Rotate stars */
+stars.rotation.y += 0.0005;
+
+/* Simulated Multiplayer */
+sendPlayerState();
+
+renderer.render(scene,camera);
+}
+
 animate();
 
 /* RESPONSIVE */
 window.addEventListener("resize",()=>{
-  camera.aspect = window.innerWidth/window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+camera.aspect = window.innerWidth/window.innerHeight;
+camera.updateProjectionMatrix();
+renderer.setSize(window.innerWidth, window.innerHeight);
 });
 </script>
 
