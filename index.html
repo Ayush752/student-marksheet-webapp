@@ -1,1 +1,166 @@
-<h1> Welcome </h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welcome Page</title>
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body{
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background: linear-gradient(-45deg, #667eea, #764ba2, #6a11cb, #2575fc);
+    background-size: 400% 400%;
+    animation: gradientBG 10s ease infinite;
+    overflow:hidden;
+}
+
+/* Background animation */
+@keyframes gradientBG {
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+
+/* Floating shapes */
+body::before,
+body::after{
+    content:'';
+    position:absolute;
+    width:400px;
+    height:400px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.1);
+    animation: float 6s infinite ease-in-out alternate;
+}
+
+body::before{
+    top:-100px;
+    left:-100px;
+}
+
+body::after{
+    bottom:-120px;
+    right:-120px;
+}
+
+@keyframes float{
+    from{transform:translateY(0px);}
+    to{transform:translateY(40px);}
+}
+
+/* Glass Card */
+.container{
+    position:relative;
+    background: rgba(255,255,255,0.1);
+    padding:50px;
+    border-radius:20px;
+    backdrop-filter: blur(15px);
+    box-shadow:0 8px 32px rgba(0,0,0,0.2);
+    text-align:center;
+    color:#fff;
+    width:90%;
+    max-width:500px;
+    animation: fadeIn 1.5s ease;
+}
+
+@keyframes fadeIn{
+    from{opacity:0; transform:translateY(40px);}
+    to{opacity:1; transform:translateY(0);}
+}
+
+.container h1{
+    font-size:2.5rem;
+    margin-bottom:15px;
+}
+
+.container p{
+    font-size:1rem;
+    margin-bottom:30px;
+    opacity:0.9;
+}
+
+/* Buttons */
+.btn-group{
+    display:flex;
+    justify-content:center;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.btn{
+    padding:12px 30px;
+    border:none;
+    border-radius:50px;
+    cursor:pointer;
+    font-size:0.9rem;
+    font-weight:600;
+    transition:0.4s;
+    position:relative;
+    overflow:hidden;
+}
+
+/* Primary Button */
+.btn-primary{
+    background:#fff;
+    color:#764ba2;
+}
+
+.btn-primary:hover{
+    background:transparent;
+    color:#fff;
+    border:2px solid #fff;
+    transform:scale(1.1);
+}
+
+/* Secondary Button */
+.btn-secondary{
+    background:transparent;
+    border:2px solid #fff;
+    color:#fff;
+}
+
+.btn-secondary:hover{
+    background:#fff;
+    color:#764ba2;
+    transform:scale(1.1);
+}
+
+/* Responsive */
+@media(max-width:500px){
+    .container{
+        padding:30px;
+    }
+    .container h1{
+        font-size:2rem;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Welcome</h1>
+    <p>Your journey starts here. Explore, create, and innovate with us.</p>
+
+    <div class="btn-group">
+        <button class="btn btn-primary">Get Started</button>
+        <button class="btn btn-secondary">Learn More</button>
+    </div>
+</div>
+
+</body>
+</html>
