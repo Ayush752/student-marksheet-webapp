@@ -3,230 +3,180 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ULTRA COSMIC ENGINE</title>
-
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-
+<title>INTERACTIVE COSMIC VR UNIVERSE</title>
 <style>
-:root {
-  --bg: #0d0d0d;
-  --text: #fff;
-  --primary: #00f5ff;
-  --secondary: #ff00ff;
-  --accent: #00ff88;
-}
-
-body {
-  margin:0;
-  font-family:'Orbitron', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  overflow-x:hidden;
-  transition: background 0.3s, color 0.3s;
-}
-
-/* ===== NAVBAR ===== */
-nav {
-  position: fixed;
-  width: 100%;
-  padding: 20px 50px;
-  display:flex;
-  justify-content: space-between;
-  backdrop-filter: blur(10px);
-  z-index: 10;
-}
-nav h1 {
-  color: var(--primary);
-  text-shadow:0 0 15px var(--primary);
-}
-nav ul { display:flex; list-style:none; gap:30px; }
-nav ul li a {
-  color: var(--text);
-  text-decoration:none;
-  font-weight:bold;
-  transition: 0.3s;
-}
-nav ul li a:hover { color: var(--secondary); }
-
-/* ===== HERO ===== */
-.hero {
-  height:100vh;
-  display:flex; flex-direction:column;
-  justify-content:center; align-items:center;
-  text-align:center;
-  padding:0 20px;
-  perspective: 1000px;
-}
-.hero h2 {
-  font-size:3rem;
-  margin-bottom:20px;
-  animation:fadeIn 1.5s ease forwards;
-}
-.hero p {
-  font-size:1.2rem;
-  margin-bottom:30px;
-  animation:fadeIn 2s ease forwards;
-}
-.hero button {
-  padding:15px 40px;
-  border:none;
-  border-radius:50px;
-  background: linear-gradient(45deg,var(--primary),var(--secondary));
-  color:#fff;
-  font-weight:bold;
-  cursor:pointer;
-  transition:0.3s;
-  box-shadow:0 0 20px var(--primary),0 0 40px var(--secondary);
-  animation:fadeIn 2.5s ease forwards;
-}
-.hero button:hover {
-  transform: scale(1.1);
-  box-shadow:0 0 40px var(--primary),0 0 80px var(--secondary);
-}
-
-/* ===== DARK/LIGHT MODE ===== */
-.toggle-btn {
-  position: fixed; top:20px; right:20px;
-  padding:10px 20px;
-  border:none; border-radius:30px;
-  cursor:pointer; background:var(--primary); color:#000;
-  font-weight:bold; z-index:11;
-}
-
-/* ===== SECTIONS ===== */
-.section { padding:100px 20px; text-align:center; }
-.fade-up { opacity:0; transform:translateY(50px); transition: all 1s ease; }
-.fade-up.active { opacity:1; transform:translateY(0); }
-
-/* ===== PLANET OBJECTS ===== */
-.planet {
-  position:absolute;
-  border-radius:50%;
-  box-shadow:0 0 20px var(--primary);
-  animation: float 6s ease-in-out infinite alternate;
-}
-@keyframes fadeIn {
-  from{opacity:0; transform:translateY(-20px);}
-  to{opacity:1; transform:translateY(0);}
-}
-@keyframes float {
-  0%{transform: translateY(0) rotate(0deg);}
-  100%{transform: translateY(-30px) rotate(360deg);}
+body{margin:0; overflow:hidden; font-family:'Orbitron',sans-serif; background:black; color:white;}
+#hud{position:fixed;top:20px;left:20px;z-index:10;color:#00f5ff;font-family:monospace;}
+button#toggleBtn{
+  position:fixed;top:20px;right:20px;z-index:11;padding:10px 20px;border:none;border-radius:30px;cursor:pointer;background:#00f5ff;color:#000;font-weight:bold;
 }
 </style>
 </head>
 <body>
+<div id="hud">🪐 COSMIC VR UNIVERSE - WASD/Mouse | Click to Lock Pointer | VR Ready</div>
+<button id="toggleBtn">Toggle Light Mode</button>
 
-<!-- PARTICLE CANVAS -->
-<canvas id="particles"></canvas>
+<script type="module">
+// Import Three.js + extras
+import * as THREE from 'https://cdn.skypack.dev/three@0.128.0';
+import { VRButton } from 'https://cdn.skypack.dev/three@0.128.0/examples/jsm/webxr/VRButton.js';
+import { XRControllerModelFactory } from 'https://cdn.skypack.dev/three@0.128.0/examples/jsm/webxr/XRControllerModelFactory.js';
+import { OrbitControls } from 'https://cdn.skypack.dev/three@0.128.0/examples/jsm/controls/OrbitControls.js';
 
-<!-- NAVBAR -->
-<nav>
-  <h1>ULTRA COSMIC</h1>
-  <ul>
-    <li><a href="#hero">Home</a></li>
-    <li><a href="#about">About</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
-</nav>
+// --- Scene & Camera ---
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x000000,0.002);
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 5000);
+camera.position.set(0,50,150);
 
-<!-- TOGGLE -->
-<button class="toggle-btn" id="toggleBtn">Toggle Light Mode</button>
+// --- Renderer ---
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.xr.enabled = true;
+document.body.appendChild(renderer.domElement);
+document.body.appendChild(VRButton.createButton(renderer));
 
-<!-- HERO -->
-<section class="hero" id="hero">
-  <h2>Welcome to the ULTRA COSMIC ENGINE</h2>
-  <p>Experience an insane interactive cosmic landing page in one file.</p>
-  <button onclick="alert('Entering the cosmic realm!')">Launch</button>
-</section>
+// --- Lights ---
+const light = new THREE.PointLight(0xffffff,2);
+light.position.set(100,200,100);
+scene.add(light);
 
-<!-- ABOUT -->
-<section class="section fade-up" id="about">
-  <h2>About</h2>
-  <p>This landing page is enhanced with neon particles, floating planets, scroll animations, and interactive effects.</p>
-</section>
+// --- Starfield ---
+const starGeo = new THREE.BufferGeometry();
+const starCount=20000;
+const positions=new Float32Array(starCount*3);
+for(let i=0;i<starCount*3;i++){positions[i]=(Math.random()-0.5)*4000;}
+starGeo.setAttribute('position', new THREE.BufferAttribute(positions,3));
+const stars=new THREE.Points(starGeo,new THREE.PointsMaterial({color:0xffffff,size:1}));
+scene.add(stars);
 
-<!-- CONTACT -->
-<section class="section fade-up" id="contact">
-  <h2>Contact</h2>
-  <p>Reach us at <strong>cosmic@engine.com</strong></p>
-</section>
+// --- Planets ---
+const planets=[];
+function createPlanet(color,size,distance,speed,moons=0){
+  const geo = new THREE.SphereGeometry(size,32,32);
+  const mat = new THREE.MeshStandardMaterial({color:color,emissive:color,emissiveIntensity:0.3});
+  const mesh = new THREE.Mesh(geo,mat);
+  mesh.userData={distance,speed,angle:Math.random()*Math.PI*2,moons:[]};
+  mesh.position.set(distance,0,0);
+  scene.add(mesh);
+  // Moons
+  for(let i=0;i<moons;i++){
+    const mGeo = new THREE.SphereGeometry(size*0.3,16,16);
+    const mMat = new THREE.MeshStandardMaterial({color:0x888888,emissive:0x555555});
+    const moon = new THREE.Mesh(mGeo,mMat);
+    moon.userData={angle:Math.random()*Math.PI*2,speed:0.02+Math.random()*0.01,distance:size*2+i*5};
+    mesh.add(moon);
+    mesh.userData.moons.push(moon);
+  }
+  planets.push(mesh);
+}
+createPlanet(0xffaa00,20,0,0); // sun
+createPlanet(0x00aaff,8,60,0.01,1);
+createPlanet(0xff00ff,6,100,0.008,2);
+createPlanet(0x00ff88,5,140,0.006,1);
 
-<!-- FLOATING PLANETS -->
-<div class="planet" style="width:60px;height:60px;top:100px;left:50px;background:#00f5ff;"></div>
-<div class="planet" style="width:40px;height:40px;top:300px;left:300px;background:#ff00ff;"></div>
-<div class="planet" style="width:80px;height:80px;top:500px;left:150px;background:#00ff88;"></div>
+// --- NPC Spaceships ---
+const npcShips=[];
+function createShip(color,x,y,z){
+  const geo = new THREE.ConeGeometry(2,6,8);
+  const mat = new THREE.MeshStandardMaterial({color:color,emissive:color});
+  const ship = new THREE.Mesh(geo,mat);
+  ship.position.set(x,y,z);
+  ship.rotation.x=Math.PI/2;
+  ship.userData={direction:new THREE.Vector3(Math.random()-0.5,Math.random()-0.1,Math.random()-0.5).normalize()};
+  scene.add(ship);
+  npcShips.push(ship);
+}
+for(let i=0;i<5;i++){createShip(0xff00ff,(Math.random()-0.5)*400,(Math.random()-0.5)*200,(Math.random()-0.5)*400);}
 
-<script>
-/* ===== DARK/LIGHT MODE ===== */
-const toggleBtn = document.getElementById('toggleBtn');
-toggleBtn.addEventListener('click', () => {
-  document.body.classList.toggle('light-mode');
-  if(document.body.classList.contains('light-mode')){
-    document.documentElement.style.setProperty('--bg','#f0f0f0');
-    document.documentElement.style.setProperty('--text','#111');
-    toggleBtn.innerText='Toggle Dark Mode';
-  }else{
-    document.documentElement.style.setProperty('--bg','#0d0d0d');
-    document.documentElement.style.setProperty('--text','#fff');
-    toggleBtn.innerText='Toggle Light Mode';
+// --- Controls ---
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping=true;
+controls.dampingFactor=0.05;
+controls.enablePan=false;
+controls.minDistance=50;
+controls.maxDistance=500;
+
+// --- FPS Movement ---
+let move={w:false,s:false,a:false,d:false};
+document.body.addEventListener("click",()=>document.body.requestPointerLock());
+document.addEventListener("mousemove",(e)=>{
+  if(document.pointerLockElement===document.body){
+    camera.rotation.y-=e.movementX*0.002;
+    camera.rotation.x-=e.movementY*0.002;
   }
 });
+document.addEventListener("keydown",(e)=>{move[e.key.toLowerCase()]=true;});
+document.addEventListener("keyup",(e)=>{move[e.key.toLowerCase()]=false;});
 
-/* ===== SCROLL ANIM ===== */
-const faders = document.querySelectorAll('.fade-up');
-window.addEventListener('scroll', () => {
-  const trigger = window.innerHeight * 0.85;
-  faders.forEach(f => {
-    const top = f.getBoundingClientRect().top;
-    if(top < trigger) f.classList.add('active');
+// --- VR Controllers ---
+const controller1 = renderer.xr.getController(0);
+const controller2 = renderer.xr.getController(1);
+scene.add(controller1);
+scene.add(controller2);
+
+const controllerModelFactory = new XRControllerModelFactory();
+const c1Grip = renderer.xr.getControllerGrip(0);
+c1Grip.add(controllerModelFactory.createControllerModel(c1Grip));
+scene.add(c1Grip);
+const c2Grip = renderer.xr.getControllerGrip(1);
+c2Grip.add(controllerModelFactory.createControllerModel(c2Grip));
+scene.add(c2Grip);
+
+// --- Animate ---
+function animate(){
+  renderer.setAnimationLoop(render);
+}
+function render(){
+  const speed=1;
+  if(move.w) camera.translateZ(-speed);
+  if(move.s) camera.translateZ(speed);
+  if(move.a) camera.translateX(-speed);
+  if(move.d) camera.translateX(speed);
+
+  // Planet orbit
+  planets.forEach(p=>{
+    p.userData.angle+=p.userData.speed;
+    p.position.x = Math.cos(p.userData.angle)*p.userData.distance;
+    p.position.z = Math.sin(p.userData.angle)*p.userData.distance;
+    p.userData.moons.forEach(m=>{
+      m.userData.angle+=m.userData.speed;
+      m.position.x = Math.cos(m.userData.angle)*m.userData.distance;
+      m.position.z = Math.sin(m.userData.angle)*m.userData.distance;
+    });
   });
+
+  // NPC ship movement
+  npcShips.forEach(ship=>{
+    ship.position.add(ship.userData.direction);
+    // Simple bounds
+    if(ship.position.length()>400) ship.userData.direction.multiplyScalar(-1);
+  });
+
+  // Rotate stars slightly
+  stars.rotation.y += 0.0005;
+
+  controls.update();
+  renderer.render(scene,camera);
+}
+animate();
+
+// --- Responsive ---
+window.addEventListener("resize",()=>{
+  camera.aspect=window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-/* ===== PARTICLE BACKGROUND ===== */
-const canvas = document.getElementById('particles');
-const ctx = canvas.getContext('2d');
-let W = canvas.width = window.innerWidth;
-let H = canvas.height = window.innerHeight;
-
-const stars = [];
-for(let i=0;i<200;i++){
-  stars.push({x:Math.random()*W, y:Math.random()*H, r:Math.random()*2+1, dx:(Math.random()-0.5)*0.5, dy:(Math.random()-0.5)*0.5});
-}
-
-function draw(){
-  ctx.clearRect(0,0,W,H);
-  stars.forEach(s=>{
-    ctx.beginPath();
-    ctx.fillStyle = `hsl(${Math.random()*360},100%,70%)`;
-    ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
-    ctx.fill();
-    s.x += s.dx; s.y += s.dy;
-    if(s.x>W) s.x=0;
-    if(s.x<0) s.x=W;
-    if(s.y>H) s.y=0;
-    if(s.y<0) s.y=H;
-  });
-  requestAnimationFrame(draw);
-}
-draw();
-
-window.addEventListener('resize',()=>{
-  W=canvas.width=window.innerWidth;
-  H=canvas.height=window.innerHeight;
-});
-
-/* ===== MOUSE PARALLAX FOR PLANETS ===== */
-const planets = document.querySelectorAll('.planet');
-document.addEventListener('mousemove', e=>{
-  const x = (e.clientX - W/2)/50;
-  const y = (e.clientY - H/2)/50;
-  planets.forEach((p,i)=>{
-    p.style.transform = `translate(${x*(i+1)}px, ${y*(i+1)}px)`;
-  });
+// --- Dark / Light Mode ---
+const toggleBtn = document.getElementById('toggleBtn');
+toggleBtn.addEventListener('click',()=>{
+  if(document.body.style.background=='black'){
+    document.body.style.background='white';
+  }else{
+    document.body.style.background='black';
+  }
 });
 </script>
-
 </body>
 </html>
