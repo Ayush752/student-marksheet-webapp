@@ -3,18 +3,52 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ULTRA INTERSTELLAR MMO COSMOS</title>
+<title>CYBERPUNK COSMIC MMO</title>
 <style>
-body{margin:0;overflow:hidden;font-family:'Orbitron',sans-serif;background:black;color:white;}
-#hud{position:fixed;top:20px;left:20px;z-index:10;color:#00f5ff;font-family:monospace;}
+body{
+  margin:0;
+  overflow:hidden;
+  font-family:'Orbitron',sans-serif;
+  background:#0d0d20;
+  color:#ff00ff;
+}
+
+#hud{
+  position:fixed;
+  top:20px;
+  left:20px;
+  z-index:10;
+  color:#00ffff;
+  font-family:monospace;
+  background:rgba(0,0,0,0.5);
+  padding:10px 15px;
+  border-radius:10px;
+  border:1px solid #ff00ff;
+}
+
 button#toggleBtn{
-position:fixed;top:20px;right:20px;z-index:11;padding:10px 20px;border:none;border-radius:30px;cursor:pointer;background:#00f5ff;color:#000;font-weight:bold;
+  position:fixed;
+  top:20px;
+  right:20px;
+  z-index:11;
+  padding:10px 20px;
+  border:none;
+  border-radius:30px;
+  cursor:pointer;
+  background:linear-gradient(45deg,#ff00ff,#00ffff);
+  color:#0d0d20;
+  font-weight:bold;
+  box-shadow:0 0 20px #ff00ff,0 0 40px #00ffff;
+  transition:0.3s;
+}
+button#toggleBtn:hover{
+  box-shadow:0 0 40px #ff00ff,0 0 80px #00ffff;
 }
 </style>
 </head>
 <body>
-<div id="hud">🪐 ULTRA INTERSTELLAR MMO COSMOS - WASD/Mouse | VR | Multiplayer Placeholder</div>
-<button id="toggleBtn">Toggle Light Mode</button>
+<div id="hud">🌌 CYBERPUNK COSMIC MMO - WASD / Mouse | Click to Lock Pointer | VR Ready</div>
+<button id="toggleBtn">Toggle Dark / Neon</button>
 
 <script type="module">
 // Imports
@@ -22,63 +56,67 @@ import * as THREE from 'https://cdn.skypack.dev/three@0.128.0';
 import { OrbitControls } from 'https://cdn.skypack.dev/three@0.128.0/examples/jsm/controls/OrbitControls.js';
 import { VRButton } from 'https://cdn.skypack.dev/three@0.128.0/examples/jsm/webxr/VRButton.js';
 
-// --- Scene & Camera ---
+// Scene & Camera
 const scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2(0x000000,0.0015);
+scene.fog = new THREE.FogExp2(0x0d0d20,0.0015);
 const camera = new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,5000);
 camera.position.set(0,50,300);
 
-// --- Renderer ---
+// Renderer
 const renderer = new THREE.WebGLRenderer({antialias:true});
 renderer.setSize(window.innerWidth,window.innerHeight);
 renderer.xr.enabled=true;
 document.body.appendChild(renderer.domElement);
 document.body.appendChild(VRButton.createButton(renderer));
 
-// --- Lights ---
-const light = new THREE.PointLight(0xffffff,2);
-light.position.set(0,500,500);
-scene.add(light);
+// Lights
+const ambientLight = new THREE.AmbientLight(0x5511ff,0.5);
+scene.add(ambientLight);
+const pointLight = new THREE.PointLight(0xff00ff,2);
+pointLight.position.set(0,500,500);
+scene.add(pointLight);
 
-// --- Starfield & Nebula ---
+// Starfield
 const starGeo = new THREE.BufferGeometry();
-const starCount = 50000;
-const starPos = new Float32Array(starCount*3);
+const starCount=40000;
+const starPos=new Float32Array(starCount*3);
 for(let i=0;i<starCount*3;i++) starPos[i]=(Math.random()-0.5)*10000;
 starGeo.setAttribute('position', new THREE.BufferAttribute(starPos,3));
-const stars = new THREE.Points(starGeo,new THREE.PointsMaterial({color:0xffffff,size:1}));
+const stars = new THREE.Points(starGeo,new THREE.PointsMaterial({color:0xff00ff,size:1}));
 scene.add(stars);
 
-// Procedural Nebula
-const nebulaGeo = new THREE.BufferGeometry();
-const nebulaCount = 5000;
-const nebulaPos = new Float32Array(nebulaCount*3);
+// Nebula
+const nebulaGeo=new THREE.BufferGeometry();
+const nebulaCount=6000;
+const nebulaPos=new Float32Array(nebulaCount*3);
 for(let i=0;i<nebulaCount*3;i++) nebulaPos[i]=(Math.random()-0.5)*5000;
-nebulaGeo.setAttribute('position', new THREE.BufferAttribute(nebulaPos,3));
-const nebulaMat = new THREE.PointsMaterial({color:0xff00ff,size:3,transparent:true,opacity:0.3});
-const nebula = new THREE.Points(nebulaGeo, nebulaMat);
+nebulaGeo.setAttribute('position',new THREE.BufferAttribute(nebulaPos,3));
+const nebulaMat = new THREE.PointsMaterial({color:0x00ffff,size:4,transparent:true,opacity:0.25});
+const nebula=new THREE.Points(nebulaGeo,nebulaMat);
 scene.add(nebula);
 
-// --- Procedural Solar Systems ---
+// Procedural Solar Systems
 const systems=[];
 function createSystem(x,z,numPlanets){
   const system = new THREE.Group();
   system.position.set(x,0,z);
 
+  // Sun
   const sunGeo = new THREE.SphereGeometry(25,32,32);
-  const sunMat = new THREE.MeshStandardMaterial({color:0xffaa00,emissive:0xffaa00,emissiveIntensity:0.3});
+  const sunMat = new THREE.MeshStandardMaterial({color:0xff00ff,emissive:0xff00ff,emissiveIntensity:0.6});
   const sun = new THREE.Mesh(sunGeo,sunMat);
   system.add(sun);
 
+  // Planets
   const planets=[];
   for(let i=0;i<numPlanets;i++){
-    const size = Math.random()*6 + 3;
-    const dist = 50 + i*25 + Math.random()*15;
-    const color = new THREE.Color(Math.random(),Math.random(),Math.random());
-    const geo = new THREE.SphereGeometry(size,16,16);
-    const mat = new THREE.MeshStandardMaterial({color:color,emissive:color,emissiveIntensity:0.2});
-    const planet = new THREE.Mesh(geo,mat);
-    planet.userData={angle:Math.random()*Math.PI*2,distance:dist,speed:0.005 + Math.random()*0.005};
+    const size = Math.random()*5+3;
+    const dist = 50+i*25+Math.random()*15;
+    const color = new THREE.Color(Math.random()*0.5+0.5,0,Math.random()*0.5+0.5);
+    const geo=new THREE.SphereGeometry(size,16,16);
+    const mat=new THREE.MeshStandardMaterial({color:color,emissive:color,emissiveIntensity:0.4});
+    const planet=new THREE.Mesh(geo,mat);
+    planet.userData={angle:Math.random()*Math.PI*2,distance:dist,speed:0.005+Math.random()*0.005};
     planet.position.set(dist,0,0);
     system.add(planet);
     planets.push(planet);
@@ -93,14 +131,14 @@ for(let i=-2;i<=2;i++){
   }
 }
 
-// --- AI NPC Fleets ---
+// NPC Fleets
 const fleets=[];
 function createNPCFleet(count){
   const fleet=[];
   for(let i=0;i<count;i++){
-    const geo = new THREE.ConeGeometry(2,6,8);
-    const mat = new THREE.MeshStandardMaterial({color:0xff00ff,emissive:0xff00ff});
-    const ship = new THREE.Mesh(geo,mat);
+    const geo=new THREE.ConeGeometry(2,6,8);
+    const mat=new THREE.MeshStandardMaterial({color:0x00ffff,emissive:0x00ffff});
+    const ship=new THREE.Mesh(geo,mat);
     ship.rotation.x=Math.PI/2;
     ship.position.set((Math.random()-0.5)*2000,(Math.random()-0.5)*300,(Math.random()-0.5)*2000);
     ship.userData={dir:new THREE.Vector3(Math.random()-0.5,Math.random()*0.1,Math.random()-0.5).normalize(),speed:0.5+Math.random()*0.5};
@@ -111,12 +149,12 @@ function createNPCFleet(count){
 }
 for(let i=0;i<5;i++) createNPCFleet(8);
 
-// --- Portals / Warp Gates ---
+// Portals / Warp Gates
 const portals=[];
 function createPortal(x,z){
-  const geo = new THREE.TorusGeometry(20,3,16,100);
-  const mat = new THREE.MeshStandardMaterial({color:0x00ffff,emissive:0x00ffff,emissiveIntensity:0.5});
-  const torus = new THREE.Mesh(geo,mat);
+  const geo=new THREE.TorusGeometry(20,3,16,100);
+  const mat=new THREE.MeshStandardMaterial({color:0xff00ff,emissive:0xff00ff,emissiveIntensity:0.5});
+  const torus=new THREE.Mesh(geo,mat);
   torus.rotation.x=Math.PI/2;
   torus.position.set(x,10,z);
   torus.userData={destination:new THREE.Vector3(x+Math.random()*2000-1000,10,z+Math.random()*2000-1000)};
@@ -127,10 +165,11 @@ for(let i=0;i<10;i++){
   createPortal((Math.random()-0.5)*3000,(Math.random()-0.5)*3000);
 }
 
-// --- Player / FPS Movement ---
+// Controls
 const controls = new OrbitControls(camera,renderer.domElement);
-controls.enableDamping=true; controls.dampingFactor=0.05;
-controls.enablePan=false;
+controls.enableDamping=true;controls.dampingFactor=0.05;controls.enablePan=false;
+
+// FPS Movement
 let move={w:false,s:false,a:false,d:false};
 document.body.addEventListener("click",()=>document.body.requestPointerLock());
 document.addEventListener("mousemove",(e)=>{
@@ -142,7 +181,7 @@ document.addEventListener("mousemove",(e)=>{
 document.addEventListener("keydown",(e)=>{move[e.key.toLowerCase()]=true;});
 document.addEventListener("keyup",(e)=>{move[e.key.toLowerCase()]=false;});
 
-// --- Animate ---
+// Animate
 function animate(){
   renderer.setAnimationLoop(render);
 }
@@ -153,12 +192,12 @@ function render(){
   if(move.a) camera.translateX(-speed);
   if(move.d) camera.translateX(speed);
 
-  // Planets Orbit
+  // Planet Orbits
   systems.forEach(sys=>{
     sys.userData.planets.forEach(p=>{
       p.userData.angle+=p.userData.speed;
-      p.position.x = Math.cos(p.userData.angle)*p.userData.distance;
-      p.position.z = Math.sin(p.userData.angle)*p.userData.distance;
+      p.position.x=Math.cos(p.userData.angle)*p.userData.distance;
+      p.position.z=Math.sin(p.userData.angle)*p.userData.distance;
     });
   });
 
@@ -170,33 +209,39 @@ function render(){
     });
   });
 
-  // Portal Teleport
+  // Portals
   portals.forEach(p=>{
     if(camera.position.distanceTo(p.position)<25){
       camera.position.copy(p.userData.destination);
     }
   });
 
-  // Rotate stars / nebula
-  stars.rotation.y += 0.0003;
-  nebula.rotation.y += 0.0001;
+  // Stars/Nebula Rotation
+  stars.rotation.y+=0.0003;
+  nebula.rotation.y+=0.0001;
 
   controls.update();
   renderer.render(scene,camera);
 }
 animate();
 
-// --- Responsive ---
+// Resize
 window.addEventListener("resize",()=>{
   camera.aspect=window.innerWidth/window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth,window.innerHeight);
 });
 
-// --- Dark / Light Mode ---
-const toggleBtn = document.getElementById('toggleBtn');
+// Dark / Neon Toggle
+const toggleBtn=document.getElementById('toggleBtn');
 toggleBtn.addEventListener('click',()=>{
-  document.body.style.background = (document.body.style.background=='black')?'white':'black';
+  if(document.body.style.background=='#0d0d20'){
+    document.body.style.background='#111';
+    stars.material.color.set(0x00ffff);
+  }else{
+    document.body.style.background='#0d0d20';
+    stars.material.color.set(0xff00ff);
+  }
 });
 </script>
 </body>
