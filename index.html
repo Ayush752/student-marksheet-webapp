@@ -1,183 +1,210 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Cosmic Engine - All In One</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INSANE COSMIC ENGINE</title>
 <style>
-body{margin:0;overflow:hidden;background:black;color:white;font-family:monospace}
-#hud{
-position:fixed;
-top:10px;
-left:10px;
-z-index:10;
-color:#00f5ff;
-}
+  /* ===== VARIABLES ===== */
+  :root {
+    --bg: #0d0d0d;
+    --text: #fff;
+    --primary: #00f5ff;
+    --secondary: #ff00ff;
+  }
+
+  /* ===== BASE ===== */
+  * {margin:0; padding:0; box-sizing:border-box;}
+  body {
+    font-family: 'Orbitron', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  canvas {position: fixed; top:0; left:0; width:100%; height:100%; z-index:-1;}
+
+  /* ===== NAVBAR ===== */
+  nav {
+    position: fixed;
+    width: 100%;
+    padding: 20px 50px;
+    display:flex;
+    justify-content: space-between;
+    backdrop-filter: blur(10px);
+    z-index: 10;
+  }
+  nav h1 {color: var(--primary); text-shadow:0 0 10px var(--primary);}
+  nav ul {display:flex; list-style:none; gap:30px;}
+  nav ul li a {
+    color: var(--text); text-decoration:none; font-weight:bold;
+    transition: color 0.3s;
+  }
+  nav ul li a:hover {color: var(--secondary);}
+
+  /* ===== HERO ===== */
+  .hero {
+    height:100vh;
+    display:flex; flex-direction:column;
+    justify-content:center; align-items:center;
+    text-align:center;
+    padding:0 20px;
+  }
+  .hero h2 {
+    font-size:3rem; margin-bottom:20px;
+    animation:fadeIn 1.5s ease forwards;
+  }
+  .hero p {
+    font-size:1.2rem; margin-bottom:30px;
+    animation:fadeIn 2s ease forwards;
+  }
+  .hero button {
+    padding:15px 40px;
+    border:none;
+    border-radius:50px;
+    background: linear-gradient(45deg,var(--primary),var(--secondary));
+    color:#fff; font-weight:bold;
+    cursor:pointer; transition: 0.3s;
+    box-shadow: 0 0 20px var(--primary),0 0 40px var(--secondary);
+    animation:fadeIn 2.5s ease forwards;
+  }
+  .hero button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 40px var(--primary),0 0 80px var(--secondary);
+  }
+
+  /* ===== DARK/LIGHT MODE ===== */
+  .toggle-btn {
+    position: fixed; top:20px; right:20px;
+    padding:10px 20px; border:none; border-radius:30px;
+    cursor:pointer; background:var(--primary); color:#000; font-weight:bold;
+    z-index:11;
+  }
+
+  /* ===== PLANET OBJECT ===== */
+  .planet {
+    position:absolute;
+    border-radius:50%;
+    box-shadow:0 0 20px var(--primary);
+    animation: float 6s ease-in-out infinite alternate;
+  }
+
+  @keyframes fadeIn {
+    from{opacity:0; transform:translateY(-20px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  @keyframes float {
+    0%{transform: translateY(0) rotate(0deg);}
+    100%{transform: translateY(-30px) rotate(360deg);}
+  }
+
+  /* ===== SCROLL ANIM ===== */
+  .section {padding:100px 20px; text-align:center;}
+  .fade-up {opacity:0; transform:translateY(50px); transition: all 1s ease;}
+  .fade-up.active {opacity:1; transform:translateY(0);}
 </style>
 </head>
 <body>
 
-<div id="hud">
-COSMIC ENGINE ONLINE<br>
-WASD Move | Mouse Look | VR Ready
-</div>
+<!-- PARTICLE CANVAS -->
+<canvas id="particles"></canvas>
 
-<script type="module">
-import * as THREE from 'https://cdn.skypack.dev/three@0.128.0';
-import { VRButton } from 'https://cdn.skypack.dev/three@0.128.0/examples/jsm/webxr/VRButton.js';
+<!-- NAVBAR -->
+<nav>
+  <h1>COSMIC ENGINE</h1>
+  <ul>
+    <li><a href="#hero">Home</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
 
-let scene = new THREE.Scene();
-let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 5000);
-let renderer = new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.xr.enabled = true;
-document.body.appendChild(renderer.domElement);
-document.body.appendChild(VRButton.createButton(renderer));
+<!-- TOGGLE -->
+<button class="toggle-btn" id="toggleBtn">Toggle Light Mode</button>
 
-/* LIGHT */
-let light = new THREE.PointLight(0xffffff,2);
-light.position.set(50,50,50);
-scene.add(light);
+<!-- HERO -->
+<section class="hero" id="hero">
+  <h2>Welcome to the Cosmic Engine</h2>
+  <p>Experience an insane interactive landing page all in one file.</p>
+  <button onclick="alert('You have entered the cosmos!')">Launch</button>
+</section>
 
-/* STARFIELD */
-const starGeo = new THREE.BufferGeometry();
-const starCount = 8000;
-const positions = new Float32Array(starCount*3);
+<!-- ABOUT -->
+<section class="section fade-up" id="about">
+  <h2>About</h2>
+  <p>This is a fully cosmic landing page with particle background, floating planets, and neon effects.</p>
+</section>
 
-for(let i=0;i<starCount*3;i++){
-positions[i] = (Math.random()-0.5)*3000;
-}
+<!-- CONTACT -->
+<section class="section fade-up" id="contact">
+  <h2>Contact</h2>
+  <p>Reach us at <strong>hello@cosmicengine.com</strong></p>
+</section>
 
-starGeo.setAttribute('position', new THREE.BufferAttribute(positions,3));
-const starMat = new THREE.PointsMaterial({color:0x00f5ff,size:1});
-const stars = new THREE.Points(starGeo,starMat);
-scene.add(stars);
+<!-- FLOATING PLANETS -->
+<div class="planet" style="width:60px; height:60px; top:100px; left:50px; background:#00f5ff;"></div>
+<div class="planet" style="width:40px; height:40px; top:300px; left:300px; background:#ff00ff;"></div>
+<div class="planet" style="width:80px; height:80px; top:500px; left:150px; background:#00ff88;"></div>
 
-/* PROCEDURAL SOLAR SYSTEM */
-let planets = [];
+<script>
+  // DARK/LIGHT MODE
+  const toggleBtn = document.getElementById('toggleBtn');
+  toggleBtn.addEventListener('click', () => {
+    document.body.classList.toggle('light-mode');
+    if(document.body.classList.contains('light-mode')){
+      document.documentElement.style.setProperty('--bg','#f0f0f0');
+      document.documentElement.style.setProperty('--text','#111');
+      toggleBtn.innerText='Toggle Dark Mode';
+    }else{
+      document.documentElement.style.setProperty('--bg','#0d0d0d');
+      document.documentElement.style.setProperty('--text','#fff');
+      toggleBtn.innerText='Toggle Light Mode';
+    }
+  });
 
-function createSolarSystem(){
-const sun = new THREE.Mesh(
-new THREE.SphereGeometry(20,32,32),
-new THREE.MeshBasicMaterial({color:0xffff00})
-);
-scene.add(sun);
+  // SCROLL ANIMATION
+  const faders = document.querySelectorAll('.fade-up');
+  window.addEventListener('scroll', () => {
+    const trigger = window.innerHeight * 0.85;
+    faders.forEach(f => {
+      const top = f.getBoundingClientRect().top;
+      if(top < trigger) f.classList.add('active');
+    });
+  });
 
-for(let i=0;i<6;i++){
-let distance = 60 + i*40;
-let size = Math.random()*5+5;
+  // PARTICLE BACKGROUND
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let W = canvas.width = window.innerWidth;
+  let H = canvas.height = window.innerHeight;
+  const stars = [];
+  for(let i=0;i<150;i++){
+    stars.push({x:Math.random()*W, y:Math.random()*H, r:Math.random()*2+1, d:Math.random()*150});
+  }
 
-let planet = new THREE.Mesh(
-new THREE.SphereGeometry(size,32,32),
-new THREE.MeshStandardMaterial({
-color:new THREE.Color(Math.random(),Math.random(),Math.random())
-})
-);
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='white';
+    ctx.globalAlpha=0.8;
+    stars.forEach(s=>{
+      ctx.beginPath();
+      ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fill();
+      s.y += Math.cos(s.d) + 1 + s.r/2;
+      s.x += Math.sin(s.d/2);
+      if(s.x>W) s.x=0;
+      if(s.x<0) s.x=W;
+      if(s.y>H) s.y=0;
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
 
-planet.userData = {
-distance:distance,
-angle:Math.random()*Math.PI*2,
-speed:0.001+Math.random()*0.002
-};
-
-planets.push(planet);
-scene.add(planet);
-}
-}
-
-createSolarSystem();
-
-/* AI NPC */
-class NPC{
-constructor(position){
-this.mesh = new THREE.Mesh(
-new THREE.SphereGeometry(5,32,32),
-new THREE.MeshStandardMaterial({color:0xff00ff})
-);
-this.mesh.position.copy(position);
-scene.add(this.mesh);
-}
-
-update(playerPos){
-let direction = playerPos.clone().sub(this.mesh.position);
-direction.normalize();
-this.mesh.position.add(direction.multiplyScalar(0.1));
-}
-}
-
-let npc = new NPC(new THREE.Vector3(100,0,-200));
-
-/* PLAYER CONTROLS */
-let move = {w:false,s:false,a:false,d:false};
-let velocity = new THREE.Vector3();
-
-document.body.addEventListener("click",()=>document.body.requestPointerLock());
-
-document.addEventListener("mousemove",(e)=>{
-if(document.pointerLockElement===document.body){
-camera.rotation.y -= e.movementX*0.002;
-camera.rotation.x -= e.movementY*0.002;
-}
-});
-
-document.addEventListener("keydown",(e)=>move[e.key.toLowerCase()]=true);
-document.addEventListener("keyup",(e)=>move[e.key.toLowerCase()]=false);
-
-camera.position.z = 100;
-
-/* MULTIPLAYER STUB */
-function sendPlayerState(){
-const state = {
-x:camera.position.x,
-y:camera.position.y,
-z:camera.position.z
-};
-// Replace with WebSocket send later
-console.log("Sending player state",state);
-}
-
-/* ENGINE LOOP */
-function animate(){
-renderer.setAnimationLoop(render);
-}
-
-function render(){
-
-velocity.set(0,0,0);
-if(move.w) velocity.z -= 1;
-if(move.s) velocity.z += 1;
-if(move.a) velocity.x -= 1;
-if(move.d) velocity.x += 1;
-
-camera.translateX(velocity.x);
-camera.translateZ(velocity.z);
-
-/* Planet Orbit */
-planets.forEach(p=>{
-p.userData.angle += p.userData.speed;
-p.position.x = Math.cos(p.userData.angle)*p.userData.distance;
-p.position.z = Math.sin(p.userData.angle)*p.userData.distance;
-});
-
-/* NPC AI */
-npc.update(camera.position);
-
-/* Rotate stars */
-stars.rotation.y += 0.0005;
-
-/* Simulated Multiplayer */
-sendPlayerState();
-
-renderer.render(scene,camera);
-}
-
-animate();
-
-/* RESPONSIVE */
-window.addEventListener("resize",()=>{
-camera.aspect = window.innerWidth/window.innerHeight;
-camera.updateProjectionMatrix();
-renderer.setSize(window.innerWidth, window.innerHeight);
-});
+  window.addEventListener('resize',()=>{
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  });
 </script>
 
 </body>
