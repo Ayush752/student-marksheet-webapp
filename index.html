@@ -3,30 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Premium Mega Landing Page</title>
+<title>Ultimate Neon Landing Page</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- AOS Animation CSS -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
 <style>
 :root{
-  --bg:#ffffff;
-  --text:#111;
-  --primary:#6a11cb;
-  --secondary:#2575fc;
-  --card:#f4f4f4;
+  --bg:#0f0f1a;
+  --text:#fff;
+  --neon1:#00f5ff;
+  --neon2:#ff00ff;
 }
 
-body.dark{
-  --bg:#121212;
-  --text:#ffffff;
-  --card:#1e1e1e;
+body.light{
+  --bg:#ffffff;
+  --text:#111;
 }
 
 *{
   margin:0;
   padding:0;
   box-sizing:border-box;
-  font-family:'Poppins',sans-serif;
+  font-family:'Orbitron',sans-serif;
   scroll-behavior:smooth;
 }
 
@@ -38,19 +40,20 @@ body{
 
 /* NAVBAR */
 nav{
+  position:fixed;
+  width:100%;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:20px 60px;
-  position:fixed;
-  width:100%;
-  background:rgba(0,0,0,0.6);
+  padding:20px 40px;
+  background:rgba(0,0,0,0.7);
   backdrop-filter:blur(10px);
   z-index:1000;
 }
 
 nav h2{
-  color:#fff;
+  color:var(--neon1);
+  text-shadow:0 0 10px var(--neon1);
 }
 
 nav ul{
@@ -60,208 +63,242 @@ nav ul{
 }
 
 nav ul li a{
-  color:#fff;
   text-decoration:none;
-  font-weight:500;
+  color:white;
 }
 
-.toggle-btn{
-  padding:6px 15px;
-  border:none;
+.hamburger{
+  display:none;
+  font-size:24px;
   cursor:pointer;
-  border-radius:20px;
-  background:#fff;
 }
 
-/* HERO SECTION WITH VIDEO */
+/* MOBILE MENU */
+@media(max-width:768px){
+  nav ul{
+    position:absolute;
+    top:70px;
+    right:0;
+    background:#111;
+    flex-direction:column;
+    width:200px;
+    display:none;
+    padding:20px;
+  }
+  nav ul.active{
+    display:flex;
+  }
+  .hamburger{
+    display:block;
+  }
+}
+
+/* HERO */
 .hero{
   height:100vh;
-  position:relative;
   display:flex;
   justify-content:center;
   align-items:center;
   text-align:center;
-  color:#fff;
-  overflow:hidden;
-}
-
-.hero video{
-  position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  z-index:-1;
-}
-
-.hero::after{
-  content:'';
-  position:absolute;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.5);
-  top:0;
-  left:0;
-}
-
-.hero-content{
-  z-index:1;
-  animation:fadeIn 1.5s ease;
+  background:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e') center/cover fixed;
 }
 
 .hero h1{
   font-size:3rem;
+  text-shadow:0 0 20px var(--neon2);
 }
 
-.hero p{
-  margin:20px 0;
-}
-
+/* GRADIENT BUTTON */
 .btn{
+  margin-top:20px;
   padding:12px 30px;
   border:none;
   border-radius:30px;
+  color:white;
+  font-weight:bold;
   cursor:pointer;
-  font-weight:600;
-  background:#fff;
-  color:#000;
-  transition:0.4s;
+  background:linear-gradient(45deg,var(--neon1),var(--neon2));
+  background-size:200% 200%;
+  animation:gradientMove 3s infinite alternate;
 }
 
-.btn:hover{
-  transform:scale(1.1);
+@keyframes gradientMove{
+  0%{background-position:0% 50%;}
+  100%{background-position:100% 50%;}
 }
 
 /* FEATURES */
-.features{
-  padding:100px 60px;
-  background:var(--card);
-  display:flex;
-  justify-content:space-around;
-  flex-wrap:wrap;
-  gap:30px;
+.section{
+  padding:100px 40px;
+  text-align:center;
 }
 
-.feature-card{
-  width:300px;
+.cards{
+  display:flex;
+  justify-content:center;
+  gap:30px;
+  flex-wrap:wrap;
+}
+
+.card{
+  background:#1a1a2e;
   padding:30px;
-  background:var(--bg);
+  width:280px;
   border-radius:15px;
-  box-shadow:0 5px 20px rgba(0,0,0,0.1);
+  box-shadow:0 0 20px var(--neon1);
   transition:0.4s;
 }
 
-.feature-card:hover{
+.card:hover{
   transform:translateY(-10px);
 }
 
-/* 3D CARD */
-.section-3d{
-  padding:100px 0;
-  display:flex;
-  justify-content:center;
-  background:linear-gradient(135deg,var(--primary),var(--secondary));
+/* PRICING */
+.pricing{
+  background:#111;
 }
 
+.price-card{
+  background:#1f1f2e;
+  padding:30px;
+  border-radius:15px;
+  width:280px;
+  box-shadow:0 0 20px var(--neon2);
+}
+
+/* 3D CARD */
 .card-3d{
+  margin:auto;
   width:300px;
   height:200px;
   display:flex;
   justify-content:center;
   align-items:center;
-  color:#fff;
-  font-size:1.5rem;
+  background:linear-gradient(135deg,var(--neon1),var(--neon2));
   border-radius:20px;
-  background:rgba(255,255,255,0.2);
-  backdrop-filter:blur(10px);
   transition:0.5s;
-  transform-style:preserve-3d;
 }
 
 .card-3d:hover{
   transform:rotateY(20deg) rotateX(15deg);
 }
 
+/* MODAL */
+.modal{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.8);
+  display:none;
+  justify-content:center;
+  align-items:center;
+}
+
+.modal-content{
+  background:#111;
+  padding:40px;
+  border-radius:15px;
+  width:300px;
+}
+
+.modal input{
+  width:100%;
+  padding:10px;
+  margin:10px 0;
+}
+
 /* FOOTER */
 footer{
+  padding:20px;
   text-align:center;
-  padding:30px;
   background:#000;
-  color:#fff;
-}
-
-@keyframes fadeIn{
-  from{opacity:0;transform:translateY(40px);}
-  to{opacity:1;transform:translateY(0);}
-}
-
-@media(max-width:768px){
-  nav{
-    padding:20px;
-  }
-  .features{
-    flex-direction:column;
-    align-items:center;
-  }
 }
 </style>
 </head>
 
 <body>
 
-<!-- NAVBAR -->
 <nav>
-  <h2>Brand</h2>
-  <ul>
+  <h2>NEON-X</h2>
+  <ul id="menu">
     <li><a href="#">Home</a></li>
-    <li><a href="#features">Services</a></li>
-    <li><a href="#threeD">3D</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#" onclick="openModal()">Login</a></li>
   </ul>
-  <button class="toggle-btn" onclick="document.body.classList.toggle('dark')">
-    🌙 Toggle
-  </button>
+  <div class="hamburger" onclick="toggleMenu()">☰</div>
 </nav>
 
-<!-- HERO SECTION -->
 <section class="hero">
-  <video autoplay muted loop>
-    <source src="your-video.mp4" type="video/mp4">
-  </video>
-
-  <div class="hero-content">
-    <h1>Welcome to the Future</h1>
-    <p>All-in-one Premium Landing Page Design</p>
-    <button class="btn">Get Started</button>
+  <div data-aos="fade-up">
+    <h1>Cyberpunk Future</h1>
+    <button class="btn">Explore Now</button>
   </div>
 </section>
 
-<!-- FEATURES SECTION -->
-<section class="features" id="features">
-  <div class="feature-card">
-    <h3>Strategy</h3>
-    <p>Professional planning for business growth.</p>
-  </div>
-  <div class="feature-card">
-    <h3>Marketing</h3>
-    <p>Powerful brand and digital marketing solutions.</p>
-  </div>
-  <div class="feature-card">
-    <h3>Support</h3>
-    <p>24/7 premium customer assistance services.</p>
+<section class="section" id="features">
+  <h2 data-aos="fade-up">Features</h2>
+  <div class="cards">
+    <div class="card" data-aos="zoom-in">Fast Performance</div>
+    <div class="card" data-aos="zoom-in">Secure System</div>
+    <div class="card" data-aos="zoom-in">Modern UI</div>
   </div>
 </section>
 
-<!-- 3D SECTION -->
-<section class="section-3d" id="threeD">
-  <div class="card-3d">
-    3D Hover Effect
+<section class="section pricing" id="pricing">
+  <h2 data-aos="fade-up">Pricing</h2>
+  <div class="cards">
+    <div class="price-card" data-aos="flip-left">
+      <h3>Basic</h3>
+      <p>$19/month</p>
+      <button class="btn">Buy</button>
+    </div>
+    <div class="price-card" data-aos="flip-left">
+      <h3>Pro</h3>
+      <p>$49/month</p>
+      <button class="btn">Buy</button>
+    </div>
   </div>
+</section>
+
+<section class="section">
+  <h2>3D Effect</h2>
+  <div class="card-3d">Hover Me</div>
 </section>
 
 <footer>
-  © 2026 Premium Landing Page | All Rights Reserved
+  © 2026 Neon-X | All Rights Reserved
 </footer>
+
+<!-- LOGIN MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h3>Login</h3>
+    <input type="text" placeholder="Username">
+    <input type="password" placeholder="Password">
+    <button class="btn" onclick="closeModal()">Login</button>
+  </div>
+</div>
+
+<!-- AOS Script -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+AOS.init();
+
+function toggleMenu(){
+  document.getElementById("menu").classList.toggle("active");
+}
+
+function openModal(){
+  document.getElementById("modal").style.display="flex";
+}
+
+function closeModal(){
+  document.getElementById("modal").style.display="none";
+}
+</script>
 
 </body>
 </html>
