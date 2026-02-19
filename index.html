@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>INTERACTIVE COSMIC VR UNIVERSE</title>
+<title>PROCEDURAL COSMIC UNIVERSE</title>
 <style>
-body{margin:0; overflow:hidden; font-family:'Orbitron',sans-serif; background:black; color:white;}
+body{margin:0;overflow:hidden;font-family:'Orbitron',sans-serif;background:black;color:white;}
 #hud{position:fixed;top:20px;left:20px;z-index:10;color:#00f5ff;font-family:monospace;}
 button#toggleBtn{
   position:fixed;top:20px;right:20px;z-index:11;padding:10px 20px;border:none;border-radius:30px;cursor:pointer;background:#00f5ff;color:#000;font-weight:bold;
@@ -13,91 +13,111 @@ button#toggleBtn{
 </style>
 </head>
 <body>
-<div id="hud">🪐 COSMIC VR UNIVERSE - WASD/Mouse | Click to Lock Pointer | VR Ready</div>
+<div id="hud">🪐 Procedural Cosmic Universe - WASD/Mouse | Click to Lock Pointer | VR Ready</div>
 <button id="toggleBtn">Toggle Light Mode</button>
 
 <script type="module">
-// Import Three.js + extras
+// Imports
 import * as THREE from 'https://cdn.skypack.dev/three@0.128.0';
-import { VRButton } from 'https://cdn.skypack.dev/three@0.128.0/examples/jsm/webxr/VRButton.js';
-import { XRControllerModelFactory } from 'https://cdn.skypack.dev/three@0.128.0/examples/jsm/webxr/XRControllerModelFactory.js';
 import { OrbitControls } from 'https://cdn.skypack.dev/three@0.128.0/examples/jsm/controls/OrbitControls.js';
+import { VRButton } from 'https://cdn.skypack.dev/three@0.128.0/examples/jsm/webxr/VRButton.js';
 
-// --- Scene & Camera ---
+// Scene & Camera
 const scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2(0x000000,0.002);
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 5000);
-camera.position.set(0,50,150);
+scene.fog = new THREE.FogExp2(0x000000,0.0015);
+const camera = new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,5000);
+camera.position.set(0,50,200);
 
-// --- Renderer ---
+// Renderer
 const renderer = new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.xr.enabled = true;
+renderer.setSize(window.innerWidth,window.innerHeight);
+renderer.xr.enabled=true;
 document.body.appendChild(renderer.domElement);
 document.body.appendChild(VRButton.createButton(renderer));
 
-// --- Lights ---
+// Lights
 const light = new THREE.PointLight(0xffffff,2);
-light.position.set(100,200,100);
+light.position.set(0,500,500);
 scene.add(light);
 
-// --- Starfield ---
+// Starfield
 const starGeo = new THREE.BufferGeometry();
-const starCount=20000;
-const positions=new Float32Array(starCount*3);
-for(let i=0;i<starCount*3;i++){positions[i]=(Math.random()-0.5)*4000;}
-starGeo.setAttribute('position', new THREE.BufferAttribute(positions,3));
-const stars=new THREE.Points(starGeo,new THREE.PointsMaterial({color:0xffffff,size:1}));
+const starCount=30000;
+const starPos = new Float32Array(starCount*3);
+for(let i=0;i<starCount*3;i++){starPos[i]=(Math.random()-0.5)*8000;}
+starGeo.setAttribute('position', new THREE.BufferAttribute(starPos,3));
+const stars = new THREE.Points(starGeo,new THREE.PointsMaterial({color:0xffffff,size:1}));
 scene.add(stars);
 
-// --- Planets ---
-const planets=[];
-function createPlanet(color,size,distance,speed,moons=0){
-  const geo = new THREE.SphereGeometry(size,32,32);
-  const mat = new THREE.MeshStandardMaterial({color:color,emissive:color,emissiveIntensity:0.3});
-  const mesh = new THREE.Mesh(geo,mat);
-  mesh.userData={distance,speed,angle:Math.random()*Math.PI*2,moons:[]};
-  mesh.position.set(distance,0,0);
-  scene.add(mesh);
-  // Moons
-  for(let i=0;i<moons;i++){
-    const mGeo = new THREE.SphereGeometry(size*0.3,16,16);
-    const mMat = new THREE.MeshStandardMaterial({color:0x888888,emissive:0x555555});
-    const moon = new THREE.Mesh(mGeo,mMat);
-    moon.userData={angle:Math.random()*Math.PI*2,speed:0.02+Math.random()*0.01,distance:size*2+i*5};
-    mesh.add(moon);
-    mesh.userData.moons.push(moon);
-  }
-  planets.push(mesh);
-}
-createPlanet(0xffaa00,20,0,0); // sun
-createPlanet(0x00aaff,8,60,0.01,1);
-createPlanet(0xff00ff,6,100,0.008,2);
-createPlanet(0x00ff88,5,140,0.006,1);
+// Procedural Solar Systems
+const systems=[];
+function createSystem(x,z,numPlanets){
+  const system = new THREE.Group();
+  system.position.set(x,0,z);
+  const sunGeo = new THREE.SphereGeometry(20,32,32);
+  const sunMat = new THREE.MeshStandardMaterial({color:0xffaa00,emissive:0xffaa00,emissiveIntensity:0.3});
+  const sun = new THREE.Mesh(sunGeo,sunMat);
+  system.add(sun);
 
-// --- NPC Spaceships ---
-const npcShips=[];
-function createShip(color,x,y,z){
+  const planets=[];
+  for(let i=0;i<numPlanets;i++){
+    const size = Math.random()*5 + 3;
+    const dist = 40 + i*20 + Math.random()*10;
+    const color = new THREE.Color(Math.random(),Math.random(),Math.random());
+    const geo = new THREE.SphereGeometry(size,16,16);
+    const mat = new THREE.MeshStandardMaterial({color:color,emissive:color,emissiveIntensity:0.2});
+    const planet = new THREE.Mesh(geo,mat);
+    planet.userData={angle:Math.random()*Math.PI*2, distance:dist, speed:0.005 + Math.random()*0.005};
+    planet.position.set(dist,0,0);
+    system.add(planet);
+    planets.push(planet);
+  }
+  system.userData = {planets};
+  scene.add(system);
+  systems.push(system);
+}
+for(let i=-1;i<=1;i++){
+  for(let j=-1;j<=1;j++){
+    createSystem(i*600,j*600,3+Math.floor(Math.random()*3));
+  }
+}
+
+// AI NPC Spaceships
+const ships=[];
+function createShip(color){
   const geo = new THREE.ConeGeometry(2,6,8);
   const mat = new THREE.MeshStandardMaterial({color:color,emissive:color});
   const ship = new THREE.Mesh(geo,mat);
-  ship.position.set(x,y,z);
   ship.rotation.x=Math.PI/2;
-  ship.userData={direction:new THREE.Vector3(Math.random()-0.5,Math.random()-0.1,Math.random()-0.5).normalize()};
+  ship.position.set((Math.random()-0.5)*1000,(Math.random()-0.5)*200,(Math.random()-0.5)*1000);
+  ship.userData={dir:new THREE.Vector3(Math.random()-0.5,Math.random()*0.1,Math.random()-0.5).normalize(),speed:0.5+Math.random()*0.5};
   scene.add(ship);
-  npcShips.push(ship);
+  ships.push(ship);
 }
-for(let i=0;i<5;i++){createShip(0xff00ff,(Math.random()-0.5)*400,(Math.random()-0.5)*200,(Math.random()-0.5)*400);}
+for(let i=0;i<10;i++){createShip(0xff00ff);}
 
-// --- Controls ---
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping=true;
-controls.dampingFactor=0.05;
+// Portal Teleportation
+const portals=[];
+function createPortal(x,z){
+  const geo = new THREE.TorusGeometry(15,2,16,100);
+  const mat = new THREE.MeshStandardMaterial({color:0x00ffff,emissive:0x00ffff,emissiveIntensity:0.5});
+  const torus = new THREE.Mesh(geo,mat);
+  torus.rotation.x=Math.PI/2;
+  torus.position.set(x,10,z);
+  torus.userData = {destination:new THREE.Vector3(x+Math.random()*1000-500,10,z+Math.random()*1000-500)};
+  scene.add(torus);
+  portals.push(torus);
+}
+for(let i=0;i<5;i++){
+  createPortal((Math.random()-0.5)*1000,(Math.random()-0.5)*1000);
+}
+
+// Controls
+const controls = new OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true; controls.dampingFactor=0.05;
 controls.enablePan=false;
-controls.minDistance=50;
-controls.maxDistance=500;
 
-// --- FPS Movement ---
+// FPS Movement
 let move={w:false,s:false,a:false,d:false};
 document.body.addEventListener("click",()=>document.body.requestPointerLock());
 document.addEventListener("mousemove",(e)=>{
@@ -109,21 +129,7 @@ document.addEventListener("mousemove",(e)=>{
 document.addEventListener("keydown",(e)=>{move[e.key.toLowerCase()]=true;});
 document.addEventListener("keyup",(e)=>{move[e.key.toLowerCase()]=false;});
 
-// --- VR Controllers ---
-const controller1 = renderer.xr.getController(0);
-const controller2 = renderer.xr.getController(1);
-scene.add(controller1);
-scene.add(controller2);
-
-const controllerModelFactory = new XRControllerModelFactory();
-const c1Grip = renderer.xr.getControllerGrip(0);
-c1Grip.add(controllerModelFactory.createControllerModel(c1Grip));
-scene.add(c1Grip);
-const c2Grip = renderer.xr.getControllerGrip(1);
-c2Grip.add(controllerModelFactory.createControllerModel(c2Grip));
-scene.add(c2Grip);
-
-// --- Animate ---
+// Animate
 function animate(){
   renderer.setAnimationLoop(render);
 }
@@ -134,48 +140,43 @@ function render(){
   if(move.a) camera.translateX(-speed);
   if(move.d) camera.translateX(speed);
 
-  // Planet orbit
-  planets.forEach(p=>{
-    p.userData.angle+=p.userData.speed;
-    p.position.x = Math.cos(p.userData.angle)*p.userData.distance;
-    p.position.z = Math.sin(p.userData.angle)*p.userData.distance;
-    p.userData.moons.forEach(m=>{
-      m.userData.angle+=m.userData.speed;
-      m.position.x = Math.cos(m.userData.angle)*m.userData.distance;
-      m.position.z = Math.sin(m.userData.angle)*m.userData.distance;
+  // Planet Orbits
+  systems.forEach(sys=>{
+    sys.userData.planets.forEach(p=>{
+      p.userData.angle+=p.userData.speed;
+      p.position.x = Math.cos(p.userData.angle)*p.userData.distance;
+      p.position.z = Math.sin(p.userData.angle)*p.userData.distance;
     });
   });
 
-  // NPC ship movement
-  npcShips.forEach(ship=>{
-    ship.position.add(ship.userData.direction);
-    // Simple bounds
-    if(ship.position.length()>400) ship.userData.direction.multiplyScalar(-1);
+  // NPC Ship movement
+  ships.forEach(s=>{
+    s.position.add(s.userData.dir.clone().multiplyScalar(s.userData.speed));
+    if(s.position.length()>2000) s.userData.dir.multiplyScalar(-1);
   });
 
-  // Rotate stars slightly
-  stars.rotation.y += 0.0005;
+  // Check portal teleport
+  portals.forEach(p=>{
+    if(camera.position.distanceTo(p.position)<20){
+      camera.position.copy(p.userData.destination);
+    }
+  });
 
-  controls.update();
   renderer.render(scene,camera);
 }
 animate();
 
-// --- Responsive ---
+// Resize
 window.addEventListener("resize",()=>{
   camera.aspect=window.innerWidth/window.innerHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(window.innerWidth,window.innerHeight);
 });
 
-// --- Dark / Light Mode ---
+// Dark/Light toggle
 const toggleBtn = document.getElementById('toggleBtn');
 toggleBtn.addEventListener('click',()=>{
-  if(document.body.style.background=='black'){
-    document.body.style.background='white';
-  }else{
-    document.body.style.background='black';
-  }
+  document.body.style.background = (document.body.style.background=='black')?'white':'black';
 });
 </script>
 </body>
