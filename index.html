@@ -1,143 +1,148 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cosmic Engineer</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-
+<title>Interstellar Architect</title>
 <style>
-body{
-  margin:0;
-  overflow:hidden;
-  background:black;
-  font-family:'Orbitron',sans-serif;
-  color:white;
-}
-
-/* HUD */
-.hud{
-  position:fixed;
-  top:20px;
-  left:20px;
-  z-index:100;
-  color:#00f5ff;
-  text-shadow:0 0 10px #00f5ff;
-}
-
-/* Chat Panel */
-.chat{
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  width:300px;
-  background:rgba(0,0,0,0.7);
-  border:1px solid #00f5ff;
-  padding:15px;
-  border-radius:10px;
-  backdrop-filter:blur(10px);
-}
-.chat input{
-  width:100%;
-  padding:8px;
-  margin-top:10px;
-  background:black;
-  border:1px solid #00f5ff;
-  color:white;
+body{margin:0;overflow:hidden;background:black;}
+#hud{
+position:fixed;
+top:20px;
+left:20px;
+color:#00f5ff;
+font-family:monospace;
+z-index:10;
 }
 </style>
 </head>
 <body>
 
-<div class="hud">
-  🌌 COSMIC ENGINEER MODE <br>
-  Use WASD to Move
-</div>
-
-<div class="chat">
-  <strong>AI Console</strong>
-  <div id="chatlog">Welcome Engineer 👨‍🚀</div>
-  <input type="text" placeholder="Ask AI..." onkeydown="if(event.key==='Enter') sendMessage(this.value)">
+<div id="hud">
+🌠 INTERSTELLAR ARCHITECT <br>
+Click to enter FPS Mode
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
 <script>
-/* THREE JS SCENE */
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({antialias:true});
+let scene = new THREE.Scene();
+let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
+let renderer = new THREE.WebGLRenderer({antialias:true});
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-/* STARFIELD */
-const starsGeometry = new THREE.BufferGeometry();
-const starCount = 5000;
-const positions = new Float32Array(starCount * 3);
-
-for(let i=0;i<starCount*3;i++){
-  positions[i] = (Math.random()-0.5) * 2000;
-}
-
-starsGeometry.setAttribute('position', new THREE.BufferAttribute(positions,3));
-const starsMaterial = new THREE.PointsMaterial({color:0x00f5ff});
-const starField = new THREE.Points(starsGeometry, starsMaterial);
-scene.add(starField);
-
-/* PLANET */
-const planetGeometry = new THREE.SphereGeometry(5,32,32);
-const planetMaterial = new THREE.MeshStandardMaterial({
-  color:0x2222ff,
-  emissive:0x00f5ff,
-  emissiveIntensity:0.5
-});
-const planet = new THREE.Mesh(planetGeometry, planetMaterial);
-planet.position.z = -30;
-scene.add(planet);
-
 /* LIGHT */
-const light = new THREE.PointLight(0xffffff,1);
-light.position.set(10,10,10);
+let light = new THREE.PointLight(0xffffff,2);
+light.position.set(10,20,10);
 scene.add(light);
 
-camera.position.z = 5;
+/* PROCEDURAL GALAXY */
+let starGeo = new THREE.BufferGeometry();
+let starCount = 10000;
+let posArray = new Float32Array(starCount*3);
+let colorArray = new Float32Array(starCount*3);
 
-/* MOVEMENT */
-const keys = {};
-document.addEventListener("keydown", e=>keys[e.key.toLowerCase()]=true);
-document.addEventListener("keyup", e=>keys[e.key.toLowerCase()]=false);
+for(let i=0;i<starCount;i++){
+  let i3 = i*3;
+  posArray[i3] = (Math.random()-0.5)*1500;
+  posArray[i3+1] = (Math.random()-0.5)*1500;
+  posArray[i3+2] = (Math.random()-0.5)*1500;
 
-function moveCamera(){
-  const speed = 0.2;
-  if(keys["w"]) camera.position.z -= speed;
-  if(keys["s"]) camera.position.z += speed;
-  if(keys["a"]) camera.position.x -= speed;
-  if(keys["d"]) camera.position.x += speed;
+  colorArray[i3] = Math.random();
+  colorArray[i3+1] = Math.random();
+  colorArray[i3+2] = 1;
 }
+
+starGeo.setAttribute('position', new THREE.BufferAttribute(posArray,3));
+starGeo.setAttribute('color', new THREE.BufferAttribute(colorArray,3));
+
+let starMat = new THREE.PointsMaterial({size:1,vertexColors:true});
+let stars = new THREE.Points(starGeo, starMat);
+scene.add(stars);
+
+/* PLANETS */
+function createPlanet(color,x,z){
+  let geo = new THREE.SphereGeometry(5,32,32);
+  let mat = new THREE.MeshStandardMaterial({
+    color:color,
+    emissive:color,
+    emissiveIntensity:0.3
+  });
+  let mesh = new THREE.Mesh(geo,mat);
+  mesh.position.set(x,0,z);
+  scene.add(mesh);
+  return mesh;
+}
+
+let planet1 = createPlanet(0x2222ff,-30,-100);
+let planet2 = createPlanet(0xff0022,40,-200);
+
+/* PORTAL */
+let portalGeo = new THREE.TorusGeometry(8,1,16,100);
+let portalMat = new THREE.MeshBasicMaterial({color:0x00f5ff});
+let portal = new THREE.Mesh(portalGeo, portalMat);
+portal.position.set(0,0,-50);
+scene.add(portal);
+
+/* FPS CONTROLS */
+let moveForward=false,moveBackward=false,moveLeft=false,moveRight=false;
+let velocity = new THREE.Vector3();
+
+document.body.addEventListener("click",()=>{
+  document.body.requestPointerLock();
+});
+
+document.addEventListener("mousemove",(e)=>{
+  if(document.pointerLockElement===document.body){
+    camera.rotation.y -= e.movementX*0.002;
+    camera.rotation.x -= e.movementY*0.002;
+  }
+});
+
+document.addEventListener("keydown",(e)=>{
+  if(e.key==="w") moveForward=true;
+  if(e.key==="s") moveBackward=true;
+  if(e.key==="a") moveLeft=true;
+  if(e.key==="d") moveRight=true;
+});
+document.addEventListener("keyup",(e)=>{
+  if(e.key==="w") moveForward=false;
+  if(e.key==="s") moveBackward=false;
+  if(e.key==="a") moveLeft=false;
+  if(e.key==="d") moveRight=false;
+});
+
+camera.position.z = 20;
 
 /* ANIMATION LOOP */
 function animate(){
   requestAnimationFrame(animate);
-  moveCamera();
-  planet.rotation.y += 0.01;
-  starField.rotation.y += 0.0005;
-  renderer.render(scene, camera);
+
+  velocity.set(0,0,0);
+  if(moveForward) velocity.z -= 0.5;
+  if(moveBackward) velocity.z += 0.5;
+  if(moveLeft) velocity.x -= 0.5;
+  if(moveRight) velocity.x += 0.5;
+
+  camera.translateX(velocity.x);
+  camera.translateZ(velocity.z);
+
+  /* Rotate Planets */
+  planet1.rotation.y += 0.01;
+  planet2.rotation.y += 0.008;
+
+  /* Rotate Portal */
+  portal.rotation.x += 0.02;
+  portal.rotation.y += 0.02;
+
+  /* TELEPORT */
+  if(camera.position.distanceTo(portal.position)<10){
+    camera.position.set(0,0,200);
+  }
+
+  renderer.render(scene,camera);
 }
 animate();
-
-/* GSAP INTRO */
-gsap.from(camera.position,{z:50,duration:3,ease:"power2.out"});
-
-/* CHAT SIMULATION */
-function sendMessage(msg){
-  if(!msg) return;
-  const log = document.getElementById("chatlog");
-  log.innerHTML += "<br><span style='color:#00ff88'>You:</span> "+msg;
-  setTimeout(()=>{
-    log.innerHTML += "<br><span style='color:#ff00ff'>AI:</span> System ready for cosmic expansion.";
-  },1000);
-}
 
 /* RESPONSIVE */
 window.addEventListener("resize",()=>{
