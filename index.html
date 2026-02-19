@@ -3,25 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ultimate Neon Landing Page</title>
+<title>INSANE Cyberpunk X</title>
 
-<!-- Google Font -->
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-
-<!-- AOS Animation CSS -->
 <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
 <style>
 :root{
-  --bg:#0f0f1a;
-  --text:#fff;
+  --bg:#070710;
   --neon1:#00f5ff;
   --neon2:#ff00ff;
-}
-
-body.light{
-  --bg:#ffffff;
-  --text:#111;
+  --neon3:#00ff88;
+  --text:#fff;
 }
 
 *{
@@ -35,62 +28,83 @@ body.light{
 body{
   background:var(--bg);
   color:var(--text);
-  transition:0.4s;
+  overflow-x:hidden;
+  cursor:none;
 }
 
-/* NAVBAR */
+/* LOADER */
+#loader{
+  position:fixed;
+  width:100%;
+  height:100%;
+  background:#000;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+  color:var(--neon1);
+  font-size:2rem;
+  animation:pulse 1.5s infinite alternate;
+}
+@keyframes pulse{
+  from{text-shadow:0 0 10px var(--neon1);}
+  to{text-shadow:0 0 40px var(--neon2);}
+}
+
+/* NEON CURSOR */
+.cursor{
+  width:20px;
+  height:20px;
+  border-radius:50%;
+  position:fixed;
+  background:var(--neon1);
+  pointer-events:none;
+  box-shadow:0 0 20px var(--neon1),0 0 40px var(--neon2);
+  transform:translate(-50%,-50%);
+  z-index:9998;
+}
+
+/* NAV */
 nav{
   position:fixed;
   width:100%;
   display:flex;
   justify-content:space-between;
-  align-items:center;
   padding:20px 40px;
-  background:rgba(0,0,0,0.7);
+  background:rgba(0,0,0,0.6);
   backdrop-filter:blur(10px);
   z-index:1000;
 }
-
 nav h2{
   color:var(--neon1);
   text-shadow:0 0 10px var(--neon1);
 }
-
 nav ul{
   list-style:none;
   display:flex;
   gap:20px;
 }
-
 nav ul li a{
   text-decoration:none;
   color:white;
 }
-
 .hamburger{
   display:none;
   font-size:24px;
   cursor:pointer;
 }
-
-/* MOBILE MENU */
 @media(max-width:768px){
   nav ul{
-    position:absolute;
-    top:70px;
-    right:0;
-    background:#111;
-    flex-direction:column;
-    width:200px;
     display:none;
+    flex-direction:column;
+    position:absolute;
+    right:0;
+    top:70px;
+    background:#111;
     padding:20px;
   }
-  nav ul.active{
-    display:flex;
-  }
-  .hamburger{
-    display:block;
-  }
+  nav ul.active{display:flex;}
+  .hamburger{display:block;}
 }
 
 /* HERO */
@@ -100,77 +114,75 @@ nav ul li a{
   justify-content:center;
   align-items:center;
   text-align:center;
-  background:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e') center/cover fixed;
+  background:url('https://images.unsplash.com/photo-1518779578993-ec3579fee39f') center/cover fixed;
 }
-
 .hero h1{
   font-size:3rem;
   text-shadow:0 0 20px var(--neon2);
 }
 
-/* GRADIENT BUTTON */
+/* BUTTON */
 .btn{
   margin-top:20px;
   padding:12px 30px;
   border:none;
   border-radius:30px;
   color:white;
-  font-weight:bold;
   cursor:pointer;
-  background:linear-gradient(45deg,var(--neon1),var(--neon2));
-  background-size:200% 200%;
-  animation:gradientMove 3s infinite alternate;
+  background:linear-gradient(45deg,var(--neon1),var(--neon2),var(--neon3));
+  background-size:300% 300%;
+  animation:gradientMove 5s infinite alternate;
 }
-
 @keyframes gradientMove{
   0%{background-position:0% 50%;}
   100%{background-position:100% 50%;}
 }
 
-/* FEATURES */
+/* PARTICLES */
+#particles-js{
+  position:fixed;
+  width:100%;
+  height:100%;
+  z-index:-1;
+}
+
+/* SECTIONS */
 .section{
   padding:100px 40px;
   text-align:center;
 }
-
 .cards{
   display:flex;
   justify-content:center;
   gap:30px;
   flex-wrap:wrap;
 }
-
 .card{
-  background:#1a1a2e;
-  padding:30px;
   width:280px;
+  padding:30px;
+  background:#111;
   border-radius:15px;
   box-shadow:0 0 20px var(--neon1);
   transition:0.4s;
 }
-
 .card:hover{
   transform:translateY(-10px);
 }
 
 /* PRICING */
-.pricing{
-  background:#111;
-}
-
 .price-card{
-  background:#1f1f2e;
-  padding:30px;
-  border-radius:15px;
   width:280px;
+  padding:30px;
+  background:#1a1a2e;
+  border-radius:15px;
   box-shadow:0 0 20px var(--neon2);
 }
 
 /* 3D CARD */
 .card-3d{
-  margin:auto;
   width:300px;
   height:200px;
+  margin:auto;
   display:flex;
   justify-content:center;
   align-items:center;
@@ -178,16 +190,13 @@ nav ul li a{
   border-radius:20px;
   transition:0.5s;
 }
-
 .card-3d:hover{
-  transform:rotateY(20deg) rotateX(15deg);
+  transform:rotateY(25deg) rotateX(15deg);
 }
 
 /* MODAL */
 .modal{
   position:fixed;
-  top:0;
-  left:0;
   width:100%;
   height:100%;
   background:rgba(0,0,0,0.8);
@@ -195,33 +204,27 @@ nav ul li a{
   justify-content:center;
   align-items:center;
 }
-
 .modal-content{
   background:#111;
   padding:40px;
   border-radius:15px;
   width:300px;
 }
-
 .modal input{
   width:100%;
   padding:10px;
   margin:10px 0;
 }
-
-/* FOOTER */
-footer{
-  padding:20px;
-  text-align:center;
-  background:#000;
-}
 </style>
 </head>
-
 <body>
 
+<div id="loader">Loading Cyberpunk X...</div>
+<div class="cursor"></div>
+<div id="particles-js"></div>
+
 <nav>
-  <h2>NEON-X</h2>
+  <h2>CYBER-X</h2>
   <ul id="menu">
     <li><a href="#">Home</a></li>
     <li><a href="#features">Features</a></li>
@@ -233,46 +236,36 @@ footer{
 
 <section class="hero">
   <div data-aos="fade-up">
-    <h1>Cyberpunk Future</h1>
-    <button class="btn">Explore Now</button>
+    <h1>INSANE FUTURE UI</h1>
+    <button class="btn">Enter Dimension</button>
   </div>
 </section>
 
 <section class="section" id="features">
   <h2 data-aos="fade-up">Features</h2>
   <div class="cards">
-    <div class="card" data-aos="zoom-in">Fast Performance</div>
-    <div class="card" data-aos="zoom-in">Secure System</div>
-    <div class="card" data-aos="zoom-in">Modern UI</div>
+    <div class="card" data-aos="zoom-in">AI Powered</div>
+    <div class="card" data-aos="zoom-in">Ultra Secure</div>
+    <div class="card" data-aos="zoom-in">Neon UI</div>
   </div>
 </section>
 
-<section class="section pricing" id="pricing">
-  <h2 data-aos="fade-up">Pricing</h2>
+<section class="section" id="pricing">
+  <h2>Pricing</h2>
   <div class="cards">
-    <div class="price-card" data-aos="flip-left">
-      <h3>Basic</h3>
-      <p>$19/month</p>
-      <button class="btn">Buy</button>
-    </div>
-    <div class="price-card" data-aos="flip-left">
+    <div class="price-card">
       <h3>Pro</h3>
       <p>$49/month</p>
-      <button class="btn">Buy</button>
+      <button class="btn">Buy Now</button>
     </div>
   </div>
 </section>
 
 <section class="section">
-  <h2>3D Effect</h2>
+  <h2>3D Experience</h2>
   <div class="card-3d">Hover Me</div>
 </section>
 
-<footer>
-  © 2026 Neon-X | All Rights Reserved
-</footer>
-
-<!-- LOGIN MODAL -->
 <div class="modal" id="modal">
   <div class="modal-content">
     <h3>Login</h3>
@@ -282,22 +275,47 @@ footer{
   </div>
 </div>
 
-<!-- AOS Script -->
+<!-- LIBRARIES -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
 <script>
 AOS.init();
 
+/* Loader */
+window.onload = function(){
+  setTimeout(()=>document.getElementById("loader").style.display="none",1500);
+};
+
+/* Hamburger */
 function toggleMenu(){
   document.getElementById("menu").classList.toggle("active");
 }
 
-function openModal(){
-  document.getElementById("modal").style.display="flex";
-}
+/* Modal */
+function openModal(){document.getElementById("modal").style.display="flex";}
+function closeModal(){document.getElementById("modal").style.display="none";}
 
-function closeModal(){
-  document.getElementById("modal").style.display="none";
-}
+/* Neon Cursor */
+const cursor=document.querySelector(".cursor");
+document.addEventListener("mousemove",(e)=>{
+  cursor.style.left=e.clientX+"px";
+  cursor.style.top=e.clientY+"px";
+});
+
+/* GSAP Animation */
+gsap.from(".hero h1",{y:-100,opacity:0,duration:1.5});
+gsap.from(".btn",{scale:0,opacity:0,duration:1,delay:1});
+
+/* Particles */
+particlesJS("particles-js",{
+  particles:{number:{value:80},
+  color:{value:"#00f5ff"},
+  size:{value:3},
+  line_linked:{enable:true,color:"#00f5ff"},
+  move:{speed:2}}
+});
 </script>
 
 </body>
